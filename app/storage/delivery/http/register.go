@@ -6,5 +6,10 @@ import (
 )
 
 func RegisterHttpEndpoints(router *mux.Router, useCase storageInterfaces.StorageUseCase) {
-	_ = NewStorageHandler(useCase)
+	h := NewStorageHandler(useCase)
+
+	router.HandleFunc("/", h.CreateOrUpdateKey).Methods("POST")
+	router.HandleFunc("/{key:[a-zA-Z]+}", h.DeleteKey).Methods("DELETE")
+	router.HandleFunc("/{key:[a-zA-Z]+}", h.GetKeyValue).Methods("GET")
+	router.HandleFunc("/", h.GetListOfKeys).Methods("GET")
 }

@@ -11,9 +11,9 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 			err := recover()
 			if err != nil {
 				golog.Errorf("panic: %s", err.(error).Error())
-			}
 
-			w.WriteHeader(http.StatusInternalServerError)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 		}()
 
 		next.ServeHTTP(w, r)

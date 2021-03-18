@@ -6,13 +6,23 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kataras/golog"
 	"key-value-storage/app/middleware"
+	storageHttp "key-value-storage/app/storage/delivery/http"
+	storageInterfaces "key-value-storage/app/storage/interfaces"
+	storageMap "key-value-storage/app/storage/repository/map"
+	"key-value-storage/app/storage/usecase"
 	"net/http"
 )
 
-type app struct {}
+type app struct {
+	storageUseCase storageInterfaces.StorageUseCase
+}
 
 func NewApp() *app {
-	return &app{}
+	storageRepository := storageMap.NewStorageRepository()
+
+	return &app{
+		storageUseCase: usecase.NewStorageUseCase(storageRepository),
+	}
 }
 
 var port = flag.Uint64("p", 8000, "port")
@@ -22,6 +32,8 @@ func (a *app) Start() {
 
 	router := mux.NewRouter()
 	router.Use(middleware.RecoveryMiddleware)
+
+	storageHttp.RegisterHttpEndpoints(router, a.storageUseCase)
 
 	http.Handle("/", router)
 
